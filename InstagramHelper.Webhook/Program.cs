@@ -1,6 +1,8 @@
+using InstagramHelper.Core;
 using InstagramHelper.Core.Services;
 using InstagramHelper.Webhook;
 using InstagramHelper.Webhook.Controllers;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,8 @@ builder.Services.AddLogging(builder =>
     builder
         .AddSimpleConsole(c => c.TimestampFormat = "[dd/MM/yy HH:mm:ss] ")
         .SetMinimumLevel(LogLevel.Debug));
+
+builder.Services.AddDbContext<InstaHelperDbContext>(opt => opt.UseInMemoryDatabase("instahelperdb"));
 
 IConfiguration config = builder.Configuration;
 builder.Services.AddCoreServices(config);
