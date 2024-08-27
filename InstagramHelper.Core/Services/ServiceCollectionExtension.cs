@@ -12,6 +12,8 @@ using InstagramHelper.Core.Services.TelegramServices.Handlers;
 using InstagramHelper.Core.Services.TelegramServices.Actions;
 using InstagramHelper.Core.Services.SchedulerService;
 using InstagramHelper.Core.Services.SubscriptionsService;
+using InstagramHelper.Core.Services.InstagramServices.FileSizeProviders;
+using InstagramHelper.Core.Services.TelegramServices.MediaServices;
 
 namespace InstagramHelper.Core.Services
 {
@@ -31,10 +33,14 @@ namespace InstagramHelper.Core.Services
                 client.DefaultRequestHeaders.Add("User-Agent", "Chrome/120.0.0.0");
             });
 
+            services.AddHttpClient<IFileSizeProvider, FileSizeProvider>("FileSizeProvider");
+
+            services.AddHttpClient("StoryAlbumComposer");
+            services.AddScoped<IStoryAlbumComposer, StoryAlbumComposer>();
+
             services.AddScoped<RetryExecutor>();
             services.AddScoped<StoriesScheduler>();
 
-            services.AddHttpClient("InstaUserDataHandler");
             services.AddScoped<InstaUserDataHandler>();
 
             services.AddScoped<UpdateHandler>();

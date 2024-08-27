@@ -7,17 +7,17 @@ namespace InstagramHelper.Core.Services.TelegramServices.Utils
     {
         public static async Task SendOneOrMoreMediaGroupAsync<TMedia>(this ITelegramBotClient botClient,
                                                         long chatId,
-                                                        IEnumerable<TMedia> media,
-                                                        Func<TMedia[], Task<IAlbumInputMedia[]>> inputMediaCreator,
+                                                        TMedia[] media,
+                                                        Func<TMedia[], Task<IEnumerable<IEnumerable<IAlbumInputMedia>>>> inputMediaCreator,
                                                         CancellationToken cancellationToken = default)
         {
-            IEnumerable<TMedia[]> mediaGroups = media.Chunk(10);
+            IEnumerable<IEnumerable<IAlbumInputMedia>> mediaGroups = await inputMediaCreator(media);
 
-            foreach (TMedia[] mediaGroup in mediaGroups)
+            foreach (IEnumerable<IAlbumInputMedia> mediaGroup in mediaGroups)
             {
                 await botClient.SendMediaGroupAsync(
                     chatId: chatId,
-                    media: await inputMediaCreator(mediaGroup),
+                    media: mediaGroup,
                     cancellationToken: cancellationToken);
             }
         }

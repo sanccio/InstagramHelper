@@ -3,11 +3,11 @@ using InstagramHelper.Core.Models;
 using InstagramHelper.Core.Services.InstagramServices.Ig;
 using InstagramHelper.Core.Services.SubscriptionsService;
 using InstagramHelper.Core.Services.TelegramServices.Keyboards;
+using InstagramHelper.Core.Services.TelegramServices.MediaServices;
 using InstagramHelper.Core.Services.TelegramServices.UserService;
 using InstagramHelper.Core.Services.TelegramServices.Utils;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -19,57 +19,23 @@ namespace InstagramHelper.Core.Services.TelegramServices
         private readonly IIgService _igService;
         private readonly ISubscriptionService _subscriptionService;
         private readonly ILogger<InstaUserDataHandler> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly RetryExecutor _retryExecutor;
         private readonly ITelegramUserService _tgUserService;
+        private readonly IStoryAlbumComposer _mediaService;
 
         public InstaUserDataHandler(
             ITelegramBotClient botClient,
             IIgService igService,
             ISubscriptionService subscriptionService,
             ILogger<InstaUserDataHandler> logger,
-            IHttpClientFactory httpClientFactory,
-            RetryExecutor retryExecutor,
-            ITelegramUserService tgUserService)
+            ITelegramUserService tgUserService,
+            IStoryAlbumComposer mediaService)
         {
             _botClient = botClient;
             _igService = igService;
             _subscriptionService = subscriptionService;
-            _httpClientFactory = httpClientFactory;
             _logger = logger;
-            _retryExecutor = retryExecutor;
             _tgUserService = tgUserService;
-        }
-
-
-        public async Task<IAlbumInputMedia[]> CreateStoryAlbumAsync(Story[] stories)
-        {
-            var album = new IAlbumInputMedia[stories.Length];
-
-            HttpClient httpClient = _httpClientFactory.CreateClient("InstaUserDataHandler");
-
-            for (int i = 0; i < stories.Length; i++)
-            {
-                if (stories[i].VideoVersions.Count == 0)
-                {
-                    album[i] = new InputMediaPhoto(InputFile.FromUri(stories[i].ImageVersions.Candidates[1].Url))
-                    {
-                        Caption = _igService.GetMediaPassedTime(stories[i].TakenAt)
-                    };
-                }
-                else if (stories[i].VideoVersions.Count > 0)
-                {
-                    Stream stream = await _retryExecutor
-                        .Retry(() => httpClient.GetStreamAsync(stories[i].VideoVersions[0].Url));
-
-                    album[i] = new InputMediaVideo(InputFile.FromStream(stream, $"{Guid.NewGuid()}.mp4"))
-                    {
-                        SupportsStreaming = true,
-                        Caption = _igService.GetMediaPassedTime(stories[i].TakenAt)
-                    };
-                }
-            }
-            return album;
+            _mediaService = mediaService;
         }
 
 
@@ -126,8 +92,8 @@ namespace InstagramHelper.Core.Services.TelegramServices
         {
             await _botClient.SendOneOrMoreMediaGroupAsync(
                 chatId: chatId,
-                media: stories,
-                inputMediaCreator: CreateStoryAlbumAsync,
+                media: stories.ToArray(),
+                inputMediaCreator: _mediaService.CreateStoryAlbumsAsync,
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation("Sent '{Count}' stories to '{ChatId}'.", stories.Count(), chatId);
