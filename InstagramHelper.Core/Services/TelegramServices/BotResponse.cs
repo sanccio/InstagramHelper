@@ -50,7 +50,7 @@ namespace InstagramHelper.Core.Services.TelegramServices
                 : $"{subscriptionStatus}\n\n" + "What should we do next?";
 
             return "🕵‍♂ I've found the user!\n\n" +
-                $"@{user.Username}\n\n" +
+                $"<a href=\"https://www.instagram.com/{user.Username}/\">@{user.Username}</a>\n\n" +
                 fullname +
                 accountPrivacy +
                 "------------------------------------\n" +
