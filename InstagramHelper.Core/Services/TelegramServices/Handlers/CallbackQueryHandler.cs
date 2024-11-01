@@ -23,7 +23,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.Handlers
             if (callback.Message is not { } callbackMessage) return;
             if (string.IsNullOrEmpty(callbackMessage.Text)) return;
 
-            string instaUsername = InstaUsernameHelper.ExtractUsernameAfterSymbol(callbackMessage.Text, '@');
+            string instaUsername = InstaUsernameUtils.ExtractUsernameAfterSymbol(callbackMessage.Text, '@');
 
             long chatId = callbackMessage.Chat.Id;
 

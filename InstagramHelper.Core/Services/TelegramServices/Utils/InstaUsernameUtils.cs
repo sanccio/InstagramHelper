@@ -1,10 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text.RegularExpressions;
-using Telegram.Bot;
 
 namespace InstagramHelper.Core.Services.TelegramServices.Utils
 {
-    public class InstaUsernameHelper
+    public static class InstaUsernameUtils
     {
         public static string ExtractUsernameAfterSymbol(string text, char symbol)
         {
@@ -14,9 +13,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.Utils
         }
 
 
-        public static async Task<string?> ValidateUsername(ITelegramBotClient botClient,
-                                                           string instaUsername,
-                                                           long chatId)
+        public static string? ValidateUsername(string instaUsername)
         {
             string invalidCharacters = "[^\\w.]";
 
@@ -26,8 +23,6 @@ namespace InstagramHelper.Core.Services.TelegramServices.Utils
 
             if (username.IsNullOrEmpty() || Regex.IsMatch(username, invalidCharacters))
             {
-                await botClient.SendTextMessageAsync(chatId, BotResponse.InvalidUsername);
-
                 return null;
             }
 

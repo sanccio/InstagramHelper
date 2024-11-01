@@ -41,9 +41,12 @@ namespace InstagramHelper.Core.Services.TelegramServices
 
         public async Task SendInstagramUserInfoAsync(string instaUsername, long chatId, CancellationToken cancellationToken)
         {
-            if (await InstaUsernameHelper.ValidateUsername(_botClient, instaUsername, chatId)
-                is not { } validatedUsername)
+            if (InstaUsernameUtils.ValidateUsername(instaUsername) is not { } validatedUsername)
             {
+                await _botClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: BotResponse.InvalidUsername,
+                    cancellationToken: cancellationToken);
                 return;
             }
 
