@@ -8,9 +8,9 @@ namespace InstagramHelper.Core.Services.TelegramServices.Handlers
     {
         private readonly InstaUserDataHandler _instaUserDataHandler;
         private readonly Commands _commands;
-        private readonly ILogger<InstaUserDataHandler> _logger;
+        private readonly ILogger<MessageHandler> _logger;
 
-        public MessageHandler(InstaUserDataHandler instaUserDataHandler, Commands commands, ILogger<InstaUserDataHandler> logger)
+        public MessageHandler(InstaUserDataHandler instaUserDataHandler, Commands commands, ILogger<MessageHandler> logger)
         {
             _instaUserDataHandler = instaUserDataHandler;
             _commands = commands;

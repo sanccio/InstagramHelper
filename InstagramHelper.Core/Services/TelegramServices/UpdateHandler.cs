@@ -14,14 +14,14 @@ namespace InstagramHelper.Core.Services.TelegramServices
     public class UpdateHandler : IUpdateHandler
     {
         private readonly ITelegramUserService _tgUserService;
-        private readonly ILogger<InstaUserDataHandler> _logger;
+        private readonly ILogger<UpdateHandler> _logger;
         private readonly TimeInputState _timeInputState;
         private readonly EmptyState _emptyState;
         private readonly BotContext _botContext;
 
         public UpdateHandler(
             ITelegramUserService tgUserService,
-            ILogger<InstaUserDataHandler> logger,
+            ILogger<UpdateHandler> logger,
             TimeInputState timeInputState,
             EmptyState emptyState,
             BotContext botContext)

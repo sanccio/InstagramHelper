@@ -7,9 +7,9 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
     {
         private readonly IIgApi _api;
         private readonly InstaHelperDbContext _context;
-        private readonly ILogger<IgApi> _logger;
+        private readonly ILogger<IgService> _logger;
 
-        public IgService(InstaHelperDbContext context, IIgApi api, ILogger<IgApi> logger)
+        public IgService(InstaHelperDbContext context, IIgApi api, ILogger<IgService> logger)
         {
             _api = api;
             _context = context;

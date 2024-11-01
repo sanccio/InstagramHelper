@@ -17,7 +17,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.Actions
         private readonly ITelegramUserService _tgUserService;
         private readonly ISubscriptionService _subscriptionService;
         private readonly IIgService _igService;
-        private readonly ILogger<CallbackQueryHandler> _logger;
+        private readonly ILogger<CallbackQueries> _logger;
         private readonly BotContext _botContext;
 
         public CallbackQueries(
@@ -26,7 +26,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.Actions
             ITelegramUserService tgUserService,
             ISubscriptionService subscriptionService,
             IIgService igService,
-            ILogger<CallbackQueryHandler> logger,
+            ILogger<CallbackQueries> logger,
             BotContext botContext)
         {
             _botClient = botClient;

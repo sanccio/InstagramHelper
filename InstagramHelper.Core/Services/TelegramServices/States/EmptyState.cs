@@ -10,12 +10,12 @@ namespace InstagramHelper.Core.Services.TelegramServices.States
     {
         private readonly CallbackQueryHandler _callbackQueryHandler;
         private readonly MessageHandler _messageHandler;
-        private readonly ILogger<StateHandler> _logger;
+        private readonly ILogger<EmptyState> _logger;
 
         public EmptyState(
             CallbackQueryHandler callbackQueryHandler,
             MessageHandler messageHandler,
-            ILogger<StateHandler> logger)
+            ILogger<EmptyState> logger)
         {
             _callbackQueryHandler = callbackQueryHandler;
             _messageHandler = messageHandler;
