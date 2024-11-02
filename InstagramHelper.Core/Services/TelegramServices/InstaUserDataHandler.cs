@@ -82,7 +82,7 @@ namespace InstagramHelper.Core.Services.TelegramServices
 
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: BotResponse.CreateFullInstaUserInfoText(instaUser, isSubscribed),
+                text: BotResponse.CreateFullInstaUserInfoText(instaUser, accessLevel, isSubscribed),
                 parseMode: ParseMode.Html,
                 replyMarkup: instaUser.IsPrivate ? null : inlineKeyboard,
                 cancellationToken: cancellationToken);

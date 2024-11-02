@@ -1,4 +1,7 @@
-﻿using InstagramHelper.Core.Models;
+﻿using InstagramHelper.Core.Enums;
+using InstagramHelper.Core.Models;
+using InstagramHelper.Core.Services.TelegramServices.Utils;
+using System.Text;
 
 namespace InstagramHelper.Core.Services.TelegramServices
 {
@@ -31,34 +34,55 @@ namespace InstagramHelper.Core.Services.TelegramServices
                 $"What should we do next?";
         }
 
-        public static string CreateFullInstaUserInfoText(InstaUser user, bool isUserSubscribed)
+        public static string CreateFullInstaUserInfoText(InstaUser user, AccessLevel accessLevel, bool isUserSubscribed)
         {
             string accountPrivacy = user.IsPrivate
-                ? "Private account 🔒\n"
-                : string.Empty;
+                ? "Private account 🔒"
+                : null!;
 
             string fullname = !string.IsNullOrEmpty(user.FullName)
-                ? $"<b>{user.FullName}</b>\n"
-                : string.Empty;
+                ? $"<b>{user.FullName}</b>"
+                : null!;
 
-            string subscriptionStatus = isUserSubscribed
-                ? UserIsSubscribed
-                : UserIsNotSubscribed;
+            string subscriptionStatus = null!;
 
-            string bottomPart = user.IsPrivate
-                ? "‼️ Interaction is impossible with private instagram accounts. Please try another one.\n"
-                : $"{subscriptionStatus}\n\n" + "What should we do next?";
+            if (accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.FullAccess)
+            {
+                subscriptionStatus = isUserSubscribed ? UserIsSubscribed : UserIsNotSubscribed;
+            }
 
-            return "🕵‍♂ I've found the user!\n\n" +
-                $"<a href=\"https://www.instagram.com/{user.Username}/\">@{user.Username}</a>\n\n" +
-                fullname +
-                accountPrivacy +
-                "------------------------------------\n" +
-                $"🌅 Posts: {user.MediaCount}\n" +
-                $"👥 Followers: {user.FollowerCount:n0}\n" +
-                $"👀 Following: {user.FollowingCount}\n" +
-                "------------------------------------\n\n" +
-                $"{bottomPart}";
+            var builder = new StringBuilder();
+
+            builder.AppendLine("🕵‍♂ I've found the user!")
+                   .AppendLine()
+                   .AppendLine($"<a href='https://www.instagram.com/{user.Username}/'>@{user.Username}</a>")
+                   .AppendLine()
+                   .AppendLineIfNotNullOrEmpty(fullname)
+                   .AppendLineIfNotNullOrEmpty(accountPrivacy)
+                   .Append("<blockquote>")
+                   .AppendLine($"🌅 Posts: {user.MediaCount}")
+                   .AppendLine($"👥 Followers: {user.FollowerCount:n0}")
+                   .Append($"👀 Following: {user.FollowingCount}")
+                   .AppendLine("</blockquote>")
+                   .AppendLine();
+
+            if (!user.IsPrivate)
+            {
+                builder.AppendLineIfNotNullOrEmpty(subscriptionStatus);
+
+                if (subscriptionStatus != null)
+                {
+                    builder.AppendLine();
+                }
+
+                builder.Append("What should we do next?");
+            }
+            else
+            {
+                builder.Append("‼️ Interaction is impossible with private instagram accounts. Please try another one.");
+            }
+
+            return builder.ToString();
         }
 
         public static string CreateSubscriptionsListText(string[] usernames)
