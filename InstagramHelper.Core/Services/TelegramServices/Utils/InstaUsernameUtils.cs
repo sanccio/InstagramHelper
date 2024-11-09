@@ -21,7 +21,11 @@ namespace InstagramHelper.Core.Services.TelegramServices.Utils
                 ? instaUsername.Remove(0, 1)
                 : instaUsername;
 
-            if (username.IsNullOrEmpty() || Regex.IsMatch(username, invalidCharacters))
+            username = username.Trim();
+
+            if (username.IsNullOrEmpty()
+                || Regex.IsMatch(username, invalidCharacters)
+                || username.Length > 30)
             {
                 return null;
             }
