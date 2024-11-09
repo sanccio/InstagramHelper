@@ -8,11 +8,13 @@ namespace InstagramHelper.Core.Services.TelegramServices.Actions
     {
         private readonly ITelegramBotClient _botClient;
         private readonly ISubscriptionService _subscriptionService;
+        private readonly InstaUserDataHandler _instaUserDataHandler;
 
-        public Commands(ITelegramBotClient botClient, ISubscriptionService subscriptionService)
+        public Commands(ITelegramBotClient botClient, ISubscriptionService subscriptionService, InstaUserDataHandler instaUserDataHandler)
         {
             _botClient = botClient;
             _subscriptionService = subscriptionService;
+            _instaUserDataHandler = instaUserDataHandler;
         }
 
 
@@ -49,6 +51,18 @@ namespace InstagramHelper.Core.Services.TelegramServices.Actions
         public async Task HandleUnknownCommandAsync(long chatId, CancellationToken cancellationToken)
         {
             await _botClient.SendTextMessageAsync(chatId, BotResponse.UnknownCommand, cancellationToken: cancellationToken);
+        }
+
+
+        public async Task HandleUserCommandAsync(string instaUsername, long chatId, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(instaUsername))
+            {
+                await _botClient.SendTextMessageAsync(chatId, BotResponse.UsernameRequiredMessage, cancellationToken: cancellationToken);
+                return;
+            }
+
+            await _instaUserDataHandler.SendInstagramUserInfoAsync(instaUsername, chatId, cancellationToken);
         }
     }
 }

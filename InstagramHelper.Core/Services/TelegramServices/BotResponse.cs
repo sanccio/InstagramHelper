@@ -21,6 +21,7 @@ namespace InstagramHelper.Core.Services.TelegramServices
         public static string UnsubscribeSuccess { get; } = "You have unsubscribed from the user!";
         public static string UserIsSubscribed { get; } = "✅ - you are subscribed to user stories.";
         public static string UserIsNotSubscribed { get; } = "🚫 - you are not subscribed to user stories.";
+        public static string UsernameRequiredMessage { get; } = "⚠️ The username must follow the command.\n\nE.g. /u <username> or /user <username>.";
 
         public static string CreateShortInstaUserInfoText(string username, bool isUserSubscribed)
         {
