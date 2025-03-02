@@ -1,5 +1,5 @@
-﻿using Telegram.Bot.Types;
-using Telegram.Bot;
+﻿using Telegram.Bot;
+using InstagramHelper.Core.Services.TelegramServices.MediaServices;
 
 namespace InstagramHelper.Core.Services.TelegramServices.Utils
 {
@@ -8,12 +8,12 @@ namespace InstagramHelper.Core.Services.TelegramServices.Utils
         public static async Task SendOneOrMoreMediaGroupAsync<TMedia>(this ITelegramBotClient botClient,
                                                         long chatId,
                                                         TMedia[] media,
-                                                        Func<TMedia[], Task<IEnumerable<IEnumerable<IAlbumInputMedia>>>> inputMediaCreator,
+                                                        Func<TMedia[], Task<IEnumerable<Album>>> inputMediaCreator,
                                                         CancellationToken cancellationToken = default)
         {
-            IEnumerable<IEnumerable<IAlbumInputMedia>> mediaGroups = await inputMediaCreator(media);
+            IEnumerable<Album> mediaGroups = await inputMediaCreator(media);
 
-            foreach (IEnumerable<IAlbumInputMedia> mediaGroup in mediaGroups)
+            foreach (Album mediaGroup in mediaGroups)
             {
                 await botClient.SendMediaGroupAsync(
                     chatId: chatId,

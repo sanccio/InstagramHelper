@@ -1,9 +1,8 @@
 ﻿using InstagramHelper.Core.Models;
-using Telegram.Bot.Types;
 
 namespace InstagramHelper.Core.Services.TelegramServices.MediaServices;
 
 public interface IStoryAlbumComposer
 {
-    Task<IEnumerable<IEnumerable<IAlbumInputMedia>>> CreateStoryAlbumsAsync(Story[] stories);
+    Task<IEnumerable<Album>> CreateStoryAlbumsAsync(Story[] stories);
 }

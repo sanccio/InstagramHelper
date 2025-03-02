@@ -12,51 +12,46 @@ public class StoryAlbumComposer : IStoryAlbumComposer
     private readonly IFileSizeProvider _fileSizeProvider;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public StoryAlbumComposer(IIgService igService, IFileSizeProvider fileSizeProvider, IHttpClientFactory httpClientFactory)
+    public StoryAlbumComposer(
+        IIgService igService,
+        IFileSizeProvider fileSizeProvider,
+        IHttpClientFactory httpClientFactory)
     {
         _igService = igService;
         _fileSizeProvider = fileSizeProvider;
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<IEnumerable<IEnumerable<IAlbumInputMedia>>> CreateStoryAlbumsAsync(Story[] stories)
+    public async Task<IEnumerable<Album>> CreateStoryAlbumsAsync(Story[] stories)
     {
-        var albums = new List<IEnumerable<IAlbumInputMedia>>();
-        var currentAlbum = new List<IAlbumInputMedia>();
-        long albumSummarySize = 0;
-
-        HttpClient httpClient = _httpClientFactory.CreateClient("StoryAlbumComposer");
+        List<Album> albums = new();
+        Album currentAlbum = new();
 
         long?[] fileSizes = await GetFileSizesAsync(stories);
-        Stream[] videoStreams = await GetVideoStreamsAsync(stories, httpClient);
-
+        Stream[] videoStreams = await GetVideoStreamsAsync(stories);
+        
         int videoStreamIndex = 0;
 
         for (int i = 0; i < stories.Length; i++)
         {
-            long? fileSize = fileSizes[i];
-
-            if (!fileSize.HasValue || fileSize > UploadLimits.MaxUploadSize)
+            if (ShouldSkipFile(fileSizes[i]))
             {
                 continue;
             }
 
-            IAlbumInputMedia inputMedia = CreateAlbumInputMediaItem(stories[i], videoStreams, ref videoStreamIndex);
+            long fileSize = fileSizes[i]!.Value;
 
-            if (albumSummarySize + fileSize.Value <= UploadLimits.MaxUploadSize && currentAlbum.Count < UploadLimits.MaxAlbumMediaCount)
-            {
-                albumSummarySize += fileSize.Value;
-                currentAlbum.Add(inputMedia);
-            }
-            else
+            IAlbumInputMedia inputMedia = CreateInputMedia(stories[i], videoStreams, ref videoStreamIndex);
+
+            if (!currentAlbum.TryAdd(inputMedia, fileSize))
             {
                 albums.Add(currentAlbum);
-                currentAlbum = new List<IAlbumInputMedia> { inputMedia };
-                albumSummarySize = fileSize.Value;
+                currentAlbum = new();
+                currentAlbum.TryAdd(inputMedia, fileSize);
             }
         }
 
-        if (currentAlbum.Any())
+        if (currentAlbum.IsNotEmpty())
         {
             albums.Add(currentAlbum);
         }
@@ -65,7 +60,13 @@ public class StoryAlbumComposer : IStoryAlbumComposer
     }
 
 
-    private IAlbumInputMedia CreateAlbumInputMediaItem(Story story, Stream[] videoStreams, ref int videoStreamIndex)
+    private static bool ShouldSkipFile(long? fileSize)
+    {
+        return !fileSize.HasValue || fileSize > UploadLimits.MaxUploadSize;
+    }
+
+
+    private IAlbumInputMedia CreateInputMedia(Story story, Stream[] videoStreams, ref int videoStreamIndex)
     {
         if (!story.VideoVersions.Any())
         {
@@ -85,8 +86,10 @@ public class StoryAlbumComposer : IStoryAlbumComposer
     }
 
 
-    private static async Task<Stream[]> GetVideoStreamsAsync(Story[] stories, HttpClient httpClient)
+    private async Task<Stream[]> GetVideoStreamsAsync(Story[] stories)
     {
+        HttpClient httpClient = _httpClientFactory.CreateClient("StoryAlbumComposer");
+
         var videoStreamTasks = stories.Where(story => story.VideoVersions.Count > 0).Select(story =>
         {
             return httpClient.GetStreamAsync(story.VideoVersions[0].Url);
