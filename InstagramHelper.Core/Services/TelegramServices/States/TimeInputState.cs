@@ -2,7 +2,6 @@
 using InstagramHelper.Core.Services.SubscriptionsService;
 using InstagramHelper.Core.Services.TelegramServices.UserService;
 using InstagramHelper.Core.Services.TelegramServices.Utils;
-using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -13,53 +12,64 @@ namespace InstagramHelper.Core.Services.TelegramServices.States
         private readonly ISubscriptionService _subscriptionService;
         private readonly ITelegramUserService _tgUserService;
         private readonly ITelegramBotClient _botClient;
-        private readonly ILogger<TimeInputState> _logger;
 
         public TimeInputState(
             ISubscriptionService subscriptionService,
             ITelegramUserService tgUserService,
-            ITelegramBotClient botClient,
-            ILogger<TimeInputState> logger)
+            ITelegramBotClient botClient)
         {
             _subscriptionService = subscriptionService;
             _tgUserService = tgUserService;
             _botClient = botClient;
-            _logger = logger;
         }
 
         public override async Task HandleState(BotContext botContext, Update update, CancellationToken cancellationToken)
         {
-            if (botContext.TelegramUser.State != State.WaitingForTimeInput || botContext.InstaUsername == null)
-            {
-                botContext.TelegramUser.State = State.Empty;
-                await _tgUserService.UpdateUser(botContext.TelegramUser);
+            await EnsureValidState(botContext);
 
-                throw new Exception("Incorrect state.");
-            }
-
-            if (update.Message?.Text == null)
+            if (update.Message?.Text is not { } messageText)
                 return;
 
-            bool isTimeValid = TimeOnly.TryParse(update.Message.Text, out TimeOnly parsedTime);
+            long chatId = update.GetChatId();
+
+            bool isTimeValid = TimeOnly.TryParse(messageText, out TimeOnly parsedTime);
 
             if (!isTimeValid)
             {
                 await _botClient.SendTextMessageAsync(
-                    chatId: update.GetChatId(),
+                    chatId: chatId,
                     text: BotResponse.IncorrectTimeFormat,
                     cancellationToken: cancellationToken);
                 return;
             }
 
-            await _subscriptionService.SubscribeToInstaUserAsync(update.GetChatId(), botContext.InstaUsername, parsedTime);
-
-            _logger.LogInformation("User '{UserId}' subscribed to '@{InstaUsername}' stories.", botContext.TelegramUser.Id, botContext.InstaUsername);
+            await _subscriptionService.SubscribeToInstaUserAsync(chatId, botContext.InstaUsername!, parsedTime);
 
             await _botClient.SendTextMessageAsync(
-                chatId: update.GetChatId(),
+                chatId: chatId,
                 text: BotResponse.SubscribeSuccess,
                 cancellationToken: cancellationToken);
 
+            await ResetStateAsync(botContext);
+        }
+
+
+        private async Task EnsureValidState(BotContext botContext)
+        {
+            State currentState = botContext.TelegramUser.State;
+
+            if (currentState != State.WaitingForTimeInput
+                || botContext.InstaUsername == null)
+            {
+                await ResetStateAsync(botContext);
+
+                throw new Exception($"Incorrect state: {currentState}. State was reset to Empty.");
+            }
+        }
+
+
+        private async Task ResetStateAsync(BotContext botContext)
+        {
             botContext.TelegramUser.State = State.Empty;
             await _tgUserService.UpdateUser(botContext.TelegramUser);
         }

@@ -1,6 +1,7 @@
 ﻿using InstagramHelper.Core.Models;
 using InstagramHelper.Core.Services.SchedulerService;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace InstagramHelper.Core.Services.SubscriptionsService
 {
@@ -8,11 +9,13 @@ namespace InstagramHelper.Core.Services.SubscriptionsService
     {
         readonly InstaHelperDbContext _context;
         readonly StoriesScheduler _scheduler;
+        readonly ILogger<SubscriptionService> _logger;
 
-        public SubscriptionService(InstaHelperDbContext context, StoriesScheduler scheduler)
+        public SubscriptionService(InstaHelperDbContext context, StoriesScheduler scheduler, ILogger<SubscriptionService> logger)
         {
             _context = context;
             _scheduler = scheduler;
+            _logger = logger;
         }
 
 
@@ -33,6 +36,8 @@ namespace InstagramHelper.Core.Services.SubscriptionsService
             await _context.SaveChangesAsync();
 
             await _scheduler.ScheduleStoriesSending(telegramUserId, instaUserId, time);
+
+            _logger.LogInformation("User '{UserId}' subscribed to '@{InstaUsername}' stories.", telegramUserId, instaUserId);
 
             return true;
         }
