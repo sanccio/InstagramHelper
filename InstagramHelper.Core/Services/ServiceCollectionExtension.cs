@@ -28,9 +28,12 @@ namespace InstagramHelper.Core.Services
             services.AddHttpClient<IIgApi, IgApi>(client =>
             {
                 string baseAddress = configuration.GetValue<string>("IgApi:BaseAddress")!;
+                string key = configuration.GetValue<string>("IgApi:Key")!;
+                string host = configuration.GetValue<string>("IgApi:Host")!;
 
                 client.BaseAddress = new Uri(baseAddress);
-                client.DefaultRequestHeaders.Add("User-Agent", "Chrome/120.0.0.0");
+                client.DefaultRequestHeaders.Add("x-rapidapi-key", key);
+                client.DefaultRequestHeaders.Add("x-rapidapi-host", host);
             });
 
             services.AddHttpClient<IFileSizeProvider, FileSizeProvider>("FileSizeProvider");

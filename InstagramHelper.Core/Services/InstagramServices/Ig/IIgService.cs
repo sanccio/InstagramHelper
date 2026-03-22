@@ -6,7 +6,7 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
     {
         Task<InstaUser?> GetUserAsync(string username);
 
-        Task<IEnumerable<Story>> GetUserStoriesAsync(string username);
+        Task<IEnumerable<Story>> GetUserStoriesAsync(IgUserIdentifier user);
 
         string GetMediaPassedTime(long takenAt);
 

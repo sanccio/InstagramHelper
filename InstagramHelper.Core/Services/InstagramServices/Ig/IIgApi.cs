@@ -6,6 +6,6 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
     {
         Task<UserResult?> UserInfoByUsername(string username);
 
-        Task<StoriesResult?> Stories(string username);
+        Task<StoriesResult?> Stories(IgUserIdentifier user);
     }
 }

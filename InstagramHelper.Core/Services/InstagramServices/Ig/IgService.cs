@@ -39,22 +39,22 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
         }
 
 
-        public async Task<IEnumerable<Story>> GetUserStoriesAsync(string username)
+        public async Task<IEnumerable<Story>> GetUserStoriesAsync(IgUserIdentifier user)
         {
             try
             {
-                StoriesResult? storiesResult = await _api.Stories(username);
+                StoriesResult? storiesResult = await _api.Stories(user);
 
                 if (storiesResult?.Stories.Any() == true)
                 {
-                    _logger.LogInformation("Fetched '@{Username}' stories ({Count}).", username, storiesResult.Stories.Count);
+                    _logger.LogInformation("Fetched '@{Username}' stories ({Count}).", user.Username, storiesResult.Stories.Count);
 
                     return storiesResult.Stories;
                 }
             }
             catch (HttpRequestException httpReqEx)
             {
-                _logger.LogError(httpReqEx, "An error occurred while fetching '@{Username}' stories.", username);
+                _logger.LogError(httpReqEx, "An error occurred while fetching '@{Username}' stories.", user.Username);
             }
 
             return Enumerable.Empty<Story>();

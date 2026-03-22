@@ -1,4 +1,5 @@
-﻿using InstagramHelper.Core.Services.TelegramServices.Actions;
+﻿using InstagramHelper.Core.Models;
+using InstagramHelper.Core.Services.TelegramServices.Actions;
 using InstagramHelper.Core.Services.TelegramServices.Utils;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
@@ -29,14 +30,33 @@ namespace InstagramHelper.Core.Services.TelegramServices.Handlers
 
             _logger.LogInformation("Received inline keyboard callback '{CallbackData}' in chat {ChatId}.", callbackData, chatId);
 
-            var action = callbackData switch
+            (string action, long? instaUserId) = ParseCallbackData(callbackData);
+
+            var instaUser = new IgUserIdentifier(instaUsername, instaUserId);
+
+            var task = action switch
             {
-                "get_stories" => _callbackQueries.GetStoriesAsync(chatId, instaUsername, cancellationToken),
+                "get_stories" => _callbackQueries.GetStoriesAsync(chatId, instaUser, cancellationToken),
                 "subscribe"   => _callbackQueries.SubscribeAsync(chatId, instaUsername, cancellationToken),
                 "unsubscribe" => _callbackQueries.UnsubscribeAsync(chatId, instaUsername, cancellationToken),
-                _             => throw new ArgumentOutOfRangeException("Non-existent callback data.", nameof(callbackData))
+                _             => throw new InvalidOperationException($"Unknown callback action: {action}.")
             };
-            await action;
+            await task;
+        }
+
+
+        private static (string action, long? instaUserId) ParseCallbackData(string callbackData)
+        {
+            string[] parts = callbackData.Split(':');
+            
+            string action = parts[0];
+
+            if (parts.Length > 1 && long.TryParse(parts[1], out long instaUserId))
+            {
+                return (action, instaUserId);
+            }
+
+            return (action, null);
         }
     }
 }

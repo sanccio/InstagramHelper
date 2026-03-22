@@ -15,7 +15,7 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
                 {
                     InstagramUser = new InstaUser
                     {
-                        Pk = "1234567",
+                        Pk = 1234567,
                         Username = "tonystark",
                         Biography = "Engineer",
                         FullName = "Tony Stark",
@@ -30,9 +30,9 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
         }
 
 
-        public Task<StoriesResult?> Stories(string username)
+        public Task<StoriesResult?> Stories(IgUserIdentifier user)
         {
-            ArgumentNullException.ThrowIfNull(username);
+            ArgumentNullException.ThrowIfNull(user);
 
             return Task.FromResult<StoriesResult?>(new StoriesResult
             {
@@ -40,7 +40,7 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
                 {
                     new Story
                     {
-                        Pk = "3243224315850640841",
+                        Pk = 3243224315850640841,
                         TakenAt = 0,
                         ImageVersions = new ImageVersion
                         {
@@ -62,7 +62,7 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
                         },
                         InstaUser = new InstaUser
                         {
-                            Pk = "1234567",
+                            Pk = 1234567,
                             Username = "tonystark"
                         }
                     }

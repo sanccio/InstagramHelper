@@ -14,7 +14,7 @@ namespace InstagramHelper.Core.Models
 
         [NotMapped]
         [JsonPropertyName("pk")]
-        public string Pk { get; set; } = default!;
+        public long Pk { get; set; } = default!;
 
         [NotMapped]
         [JsonPropertyName("biography")]

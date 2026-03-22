@@ -39,9 +39,9 @@ namespace InstagramHelper.Core.Services.SchedulerService
 
             _logger.LogInformation("Executing 'SendingStoriesJob'. Trying to send stories i:{InstagramUserId} -> tg:{ChatId}'.", instaUserId, chatId);
 
-            IEnumerable<Story> stories = await _igService.GetUserStoriesAsync(instaUserId);
+            //IEnumerable<Story> stories = await _igService.GetUserStoriesAsync(instaUserId);
 
-            await _instaUserDataHandler.SendUserStoriesAsAlbumAsync(chatId, stories);
+            //await _instaUserDataHandler.SendUserStoriesAsAlbumAsync(chatId, stories);
         }
     }
 }

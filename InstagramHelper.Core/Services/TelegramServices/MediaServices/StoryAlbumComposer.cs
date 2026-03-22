@@ -70,7 +70,7 @@ public class StoryAlbumComposer : IStoryAlbumComposer
     {
         if (!story.VideoVersions.Any())
         {
-            return new InputMediaPhoto(InputFile.FromUri(story.ImageVersions.Candidates[1].Url))
+            return new InputMediaPhoto(InputFile.FromUri(story.ImageVersions.Candidates[0].Url))
             {
                 Caption = _igService.GetMediaPassedTime(story.TakenAt)
             };
@@ -107,7 +107,7 @@ public class StoryAlbumComposer : IStoryAlbumComposer
         {
             if (story.VideoVersions.Count == 0)
             {
-                return _fileSizeProvider.GetMediaFileSizeAsync(story.ImageVersions.Candidates[1].Url);
+                return _fileSizeProvider.GetMediaFileSizeAsync(story.ImageVersions.Candidates[0].Url);
             }
             else
             {

@@ -2,7 +2,6 @@
 using InstagramHelper.Core.Models;
 using InstagramHelper.Core.Services.InstagramServices.Ig;
 using InstagramHelper.Core.Services.SubscriptionsService;
-using InstagramHelper.Core.Services.TelegramServices.Handlers;
 using InstagramHelper.Core.Services.TelegramServices.States;
 using InstagramHelper.Core.Services.TelegramServices.UserService;
 using Microsoft.Extensions.Logging;
@@ -39,14 +38,14 @@ namespace InstagramHelper.Core.Services.TelegramServices.Actions
         }
 
 
-        public async Task GetStoriesAsync(long chatId, string instaUsername, CancellationToken cancellationToken)
+        public async Task GetStoriesAsync(long chatId, IgUserIdentifier igUser, CancellationToken cancellationToken)
         {
             await _botClient.SendTextMessageAsync(
                     chatId: chatId,
                     text: BotResponse.WaitOperationEnding,
                     cancellationToken: cancellationToken);
 
-            IEnumerable<Story> stories = await _igService.GetUserStoriesAsync(instaUsername);
+            IEnumerable<Story> stories = await _igService.GetUserStoriesAsync(igUser);
 
             if (!stories.Any())
             {
@@ -55,7 +54,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.Actions
                     text: BotResponse.NoStoriesFound,
                     cancellationToken: cancellationToken);
 
-                _logger.LogInformation("No stories found for '@{InstaUsername}'.", instaUsername);
+                _logger.LogInformation("No stories found for '@{InstaUsername}'.", igUser.Username);
             }
 
             await _instaUserDataHandler.SendUserStoriesAsAlbumAsync(chatId, stories, cancellationToken);

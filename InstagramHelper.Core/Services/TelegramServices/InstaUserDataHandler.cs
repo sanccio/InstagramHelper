@@ -73,11 +73,11 @@ namespace InstagramHelper.Core.Services.TelegramServices
 
             if (accessLevel == AccessLevel.FullAccess || accessLevel == AccessLevel.Admin)
             {
-                inlineKeyboard = UserInfoKeyboard.AttachInlineKeyboardMarkup;
+                inlineKeyboard = UserInfoKeyboard.AttachInlineKeyboardMarkup(new IgUserIdentifier(instaUser.Username, instaUser.Pk));
             }
             else
             {
-                inlineKeyboard = UserInfoKeyboard.AttachReducedInlineKeyboardMarkup;
+                inlineKeyboard = UserInfoKeyboard.AttachReducedInlineKeyboardMarkup(new IgUserIdentifier(instaUser.Username, instaUser.Pk));
             }
 
             await _botClient.SendTextMessageAsync(

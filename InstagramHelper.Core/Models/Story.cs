@@ -8,7 +8,7 @@ namespace InstagramHelper.Core.Models
     {
         [Key]
         [JsonPropertyName("pk")]
-        public string Pk { get; set; } = default!;
+        public long Pk { get; set; } = default!;
 
         [JsonPropertyName("taken_at")]
         public long TakenAt { get; set; }
