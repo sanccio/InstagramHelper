@@ -10,8 +10,6 @@ namespace InstagramHelper.Core.Models
         [JsonPropertyName("username")]
         public string Username { get; set; } = default!;
 
-        public ICollection<Story> Stories { get; set; } = new List<Story>();
-
         [JsonPropertyName("pk")]
         public long? Pk { get; set; }
 
