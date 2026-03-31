@@ -15,8 +15,6 @@ namespace InstagramHelper.Core.Models
 
         [JsonPropertyName("video_versions")]
         public List<VideoVersion> VideoVersions { get; set; } = new();
-
-        public InstaUser InstaUser { get; set; } = default!;
     }
 
     public class ImageVersion

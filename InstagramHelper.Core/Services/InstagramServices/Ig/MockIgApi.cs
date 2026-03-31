@@ -59,11 +59,6 @@ namespace InstagramHelper.Core.Services.InstagramServices.Ig
                                     Height = 1466
                                 }
                             }
-                        },
-                        InstaUser = new InstaUser
-                        {
-                            Pk = 1234567,
-                            Username = "tonystark"
                         }
                     }
                 }
