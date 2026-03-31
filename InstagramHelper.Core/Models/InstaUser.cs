@@ -12,9 +12,8 @@ namespace InstagramHelper.Core.Models
 
         public ICollection<Story> Stories { get; set; } = new List<Story>();
 
-        [NotMapped]
         [JsonPropertyName("pk")]
-        public long Pk { get; set; } = default!;
+        public long? Pk { get; set; }
 
         [NotMapped]
         [JsonPropertyName("biography")]
