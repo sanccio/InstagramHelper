@@ -34,14 +34,14 @@ namespace InstagramHelper.Core.Services.SchedulerService
 
             if (string.IsNullOrEmpty(instaUsername))
             {
-                throw new JobExecutionException($"Required parameter '{instaUsername}' not found in JobDataMap");
+                throw new JobExecutionException($"Required parameter '{SchedulerKeys.InstagramUsernameKey}' not found in JobDataMap");
             }
 
             long chatId = jobDataMap.GetLong(SchedulerKeys.TelegramUserIdKey);
 
             if (chatId == 0)
             {
-                throw new JobExecutionException($"Required parameter '{chatId}' not found in JobDataMap");
+                throw new JobExecutionException($"Required parameter '{SchedulerKeys.TelegramUserIdKey}' not found in JobDataMap");
             }
 
             _logger.LogInformation(
