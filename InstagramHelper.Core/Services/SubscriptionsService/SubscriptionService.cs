@@ -19,9 +19,9 @@ namespace InstagramHelper.Core.Services.SubscriptionsService
         }
 
 
-        public async Task<bool> SubscribeToInstaUserAsync(long telegramUserId, string instaUserId, TimeOnly time)
+        public async Task<bool> SubscribeToInstaUserAsync(long telegramUserId, IgUserIdentifier igUser, TimeOnly time)
         {
-            if (IsUserSubscribed(telegramUserId, instaUserId))
+            if (IsUserSubscribed(telegramUserId, igUser.Username))
             {
                 return false;
             }
@@ -29,15 +29,15 @@ namespace InstagramHelper.Core.Services.SubscriptionsService
             var subscription = new Subscription()
             {
                 TelegramUserId = telegramUserId,
-                InstaUsername = instaUserId
+                InstaUsername = igUser.Username,
             };
 
             await _context.AddAsync(subscription);
             await _context.SaveChangesAsync();
 
-            await _scheduler.ScheduleStoriesSending(telegramUserId, instaUserId, time);
+            await _scheduler.ScheduleStoriesSending(telegramUserId, igUser, time);
 
-            _logger.LogInformation("User '{UserId}' subscribed to '@{InstaUsername}' stories.", telegramUserId, instaUserId);
+            _logger.LogInformation("User '{UserId}' subscribed to '@{InstaUsername}' stories.", telegramUserId, igUser.Username);
 
             return true;
         }

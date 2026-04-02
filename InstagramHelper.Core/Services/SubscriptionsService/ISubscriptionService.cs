@@ -1,8 +1,10 @@
-﻿namespace InstagramHelper.Core.Services.SubscriptionsService
+﻿using InstagramHelper.Core.Models;
+
+namespace InstagramHelper.Core.Services.SubscriptionsService
 {
     public interface ISubscriptionService
     {
-        Task<bool> SubscribeToInstaUserAsync(long telegramUserId, string instaUsername, TimeOnly time);
+        Task<bool> SubscribeToInstaUserAsync(long telegramUserId, IgUserIdentifier igUser, TimeOnly time);
 
         bool IsUserSubscribed(long telegramUserId, string instaUsername);
 

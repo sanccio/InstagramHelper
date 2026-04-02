@@ -6,6 +6,6 @@ namespace InstagramHelper.Core.Services.TelegramServices.States
     {
         public TelegramUser TelegramUser { get; set; }
 
-        public string? InstaUsername { get; set; }
+        public IgUserIdentifier? InstaUser { get; set; }
     }
 }

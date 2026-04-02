@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using InstagramHelper.Core.Models;
+using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace InstagramHelper.Core.Services.SchedulerService
@@ -17,21 +18,27 @@ namespace InstagramHelper.Core.Services.SchedulerService
         }
 
 
-        public async Task ScheduleStoriesSending(long telegramUserId, string instaUserId, TimeOnly utcTime)
+        public async Task ScheduleStoriesSending(long telegramUserId, IgUserIdentifier igUser, TimeOnly utcTime)
         {
             IScheduler scheduler = await _schedulerFactory.GetScheduler();
 
-            string jobName = $"{jobPrefix}{instaUserId}";
+            string jobName = $"{jobPrefix}{igUser.Username}";
 
-            IJobDetail job = JobBuilder.Create<StoriesSender>()
+            var jobBuilder = JobBuilder.Create<StoriesSender>()
                     .WithIdentity(name: jobName,
                                   group: telegramUserId.ToString())
-                    .UsingJobData(SchedulerKeys.InstagramUserIdKey, instaUserId)
-                    .UsingJobData(SchedulerKeys.TelegramUserIdKey, telegramUserId)
-                    .Build();
+                    .UsingJobData(SchedulerKeys.InstagramUsernameKey, igUser.Username)
+                    .UsingJobData(SchedulerKeys.TelegramUserIdKey, telegramUserId);
+
+            if (igUser.Pk.HasValue)
+            {
+                jobBuilder.UsingJobData(SchedulerKeys.InstagramUserPkKey, igUser.Pk.Value);
+            }
+
+            IJobDetail job = jobBuilder.Build();
 
             ITrigger trigger = TriggerBuilder.Create()
-                .WithIdentity(name: $"SendingStoriesTrigger_{instaUserId}",
+                .WithIdentity(name: $"SendingStoriesTrigger_{igUser.Username}",
                               group: telegramUserId.ToString())
                 .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(utcTime.Hour, utcTime.Minute).InTimeZone(TimeZoneInfo.Utc))
                 .Build();

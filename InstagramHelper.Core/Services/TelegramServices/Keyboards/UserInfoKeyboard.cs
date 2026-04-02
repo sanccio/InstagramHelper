@@ -10,7 +10,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.Keyboards
             {
                 new [] {
                     InlineKeyboardButton.WithCallbackData(text: "Get stories", callbackData: $"get_stories{ToCallbackSuffix(instaUser.Pk)}"),
-                    InlineKeyboardButton.WithCallbackData(text: "Subscribe to stories", callbackData: "subscribe"),
+                    InlineKeyboardButton.WithCallbackData(text: "Subscribe to stories", callbackData: $"subscribe{ToCallbackSuffix(instaUser.Pk)}"),
                 },
                 new [] {
                     InlineKeyboardButton.WithCallbackData(text: "Unsubscribe from stories", callbackData: "unsubscribe"),

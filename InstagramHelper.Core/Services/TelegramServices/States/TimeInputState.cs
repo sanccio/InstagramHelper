@@ -43,7 +43,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.States
                 return;
             }
 
-            await _subscriptionService.SubscribeToInstaUserAsync(chatId, botContext.InstaUsername!, parsedTime);
+            await _subscriptionService.SubscribeToInstaUserAsync(chatId, botContext.InstaUser!, parsedTime);
 
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
@@ -59,7 +59,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.States
             State currentState = botContext.TelegramUser.State;
 
             if (currentState != State.WaitingForTimeInput
-                || botContext.InstaUsername == null)
+                || botContext.InstaUser?.Username == null)
             {
                 await ResetStateAsync(botContext);
 

@@ -37,7 +37,7 @@ namespace InstagramHelper.Core.Services.TelegramServices.Handlers
             var task = action switch
             {
                 "get_stories" => _callbackQueries.GetStoriesAsync(chatId, instaUser, cancellationToken),
-                "subscribe"   => _callbackQueries.SubscribeAsync(chatId, instaUsername, cancellationToken),
+                "subscribe"   => _callbackQueries.SubscribeAsync(chatId, instaUser, cancellationToken),
                 "unsubscribe" => _callbackQueries.UnsubscribeAsync(chatId, instaUsername, cancellationToken),
                 _             => throw new InvalidOperationException($"Unknown callback action: {action}.")
             };

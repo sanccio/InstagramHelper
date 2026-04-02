@@ -61,9 +61,9 @@ namespace InstagramHelper.Core.Services.TelegramServices.Actions
         }
 
 
-        public async Task SubscribeAsync(long chatId, string instaUsername, CancellationToken cancellationToken)
+        public async Task SubscribeAsync(long chatId, IgUserIdentifier instaUser, CancellationToken cancellationToken)
         {
-            bool isSubscribed = _subscriptionService.IsUserSubscribed(chatId, instaUsername);
+            bool isSubscribed = _subscriptionService.IsUserSubscribed(chatId, instaUser.Username);
 
             if (isSubscribed)
             {
@@ -74,16 +74,16 @@ namespace InstagramHelper.Core.Services.TelegramServices.Actions
                 return;
             }
 
-            await _igService.CreateUserIfNotExistsAsync(new InstaUser { Username = instaUsername });
+            await _igService.CreateUserIfNotExistsAsync(new InstaUser { Username = instaUser.Username, Pk = instaUser.Pk });
 
-            _botContext.InstaUsername = instaUsername;
+            _botContext.InstaUser = instaUser;
             _botContext.TelegramUser.State = State.WaitingForTimeInput;
 
             await _tgUserService.UpdateUser(_botContext.TelegramUser);
 
             await _botClient.SendTextMessageAsync(
                 chatId: chatId,
-                text: BotResponse.CreateTimeRequestText(instaUsername),
+                text: BotResponse.CreateTimeRequestText(instaUser.Username),
                 cancellationToken: cancellationToken);
         }
 

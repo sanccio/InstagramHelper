@@ -12,7 +12,10 @@ namespace InstagramHelper.Core.Services.SchedulerService
         private readonly InstaUserDataHandler _instaUserDataHandler;
         private readonly ILogger<StoriesSender> _logger;
 
-        public StoriesSender(IIgService igService, InstaUserDataHandler instaUserDataHandler, ILogger<StoriesSender> logger)
+        public StoriesSender(
+            IIgService igService,
+            InstaUserDataHandler instaUserDataHandler,
+            ILogger<StoriesSender> logger)
         {
             _igService = igService;
             _instaUserDataHandler = instaUserDataHandler;
@@ -23,11 +26,15 @@ namespace InstagramHelper.Core.Services.SchedulerService
         {
             var jobDataMap = context.MergedJobDataMap;
 
-            string? instaUserId = jobDataMap.GetString(SchedulerKeys.InstagramUserIdKey);
+            long? instaUserPk = jobDataMap.ContainsKey(SchedulerKeys.InstagramUserPkKey)
+                ? jobDataMap.GetLong(SchedulerKeys.InstagramUserPkKey)
+                : null;
 
-            if (string.IsNullOrEmpty(instaUserId))
+            string? instaUsername = jobDataMap.GetString(SchedulerKeys.InstagramUsernameKey);
+
+            if (string.IsNullOrEmpty(instaUsername))
             {
-                throw new JobExecutionException($"Required parameter '{instaUserId}' not found in JobDataMap");
+                throw new JobExecutionException($"Required parameter '{instaUsername}' not found in JobDataMap");
             }
 
             long chatId = jobDataMap.GetLong(SchedulerKeys.TelegramUserIdKey);
@@ -37,11 +44,15 @@ namespace InstagramHelper.Core.Services.SchedulerService
                 throw new JobExecutionException($"Required parameter '{chatId}' not found in JobDataMap");
             }
 
-            _logger.LogInformation("Executing 'SendingStoriesJob'. Trying to send stories i:{InstagramUserId} -> tg:{ChatId}'.", instaUserId, chatId);
+            _logger.LogInformation(
+                "Executing StoriesSender for '@{InstagramUsername}' (pk:{Pk}) to chat '{ChatId}'.",
+                instaUsername,
+                instaUserPk,
+                chatId);
 
-            //IEnumerable<Story> stories = await _igService.GetUserStoriesAsync(instaUserId);
+            var stories = await _igService.GetUserStoriesAsync(new IgUserIdentifier(instaUsername, instaUserPk));
 
-            //await _instaUserDataHandler.SendUserStoriesAsAlbumAsync(chatId, stories);
+            await _instaUserDataHandler.SendUserStoriesAsAlbumAsync(chatId, stories);
         }
     }
 }
